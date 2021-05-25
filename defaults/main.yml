@@ -1,0 +1,4 @@
+---
+# Root directory
+tftp_root_directory: /var/lib/tftpboot
+tftp_service: tftp-service

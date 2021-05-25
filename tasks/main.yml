@@ -1,0 +1,65 @@
+---
+# tasks file for roles/tftp
+- name: TFTP Server Install
+  yum:
+    name: tftp-server
+    state: latest
+  tags:
+    - tftp_install
+
+- name: TFTP Firewall Config
+  firewalld:
+    service: tftp
+    state: enabled
+    permanent: yes
+    immediate: yes
+  tags:
+    - tftp_install
+
+- name: Creating default tftpd-hpa configuration file
+  template:
+    src: templates/tftpd-hpa
+    dest: /etc/default/tftpd-hpa
+  tags:
+    - tftp_install
+
+# TFTP Service fix from
+# https://linuxhint.com/tftp_server_centos8/
+
+- name: Setup TFTP service start
+  template:
+    src: templates/tftp-server.service
+    dest: /etc/systemd/system/tftp-server.service
+  tags:
+    - tftp_install
+
+- name: Setup socket
+  template:
+    src: files/tftp-server.socket
+    dest: /etc/systemd/system/tftp-server.socket
+  tags:
+    - tftp_install
+
+- name: Remove the old service files
+  file:
+    path: /usr/lib/systemd/system/tftp.service
+    state: absent
+  tags:
+    - tftp_install
+
+- name: Remove the old service files
+  file:
+    path: /usr/lib/systemd/system/tftp.socket
+    state: absent
+  tags:
+    - tftp_install
+#  notify:
+#    - Restart tftp
+
+- name: Start the TFTP Server Service
+  systemd:
+    name: tftp-server
+    state: started
+    enabled: true
+  tags:
+    - tftp_install

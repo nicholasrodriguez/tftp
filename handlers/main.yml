@@ -1,0 +1,8 @@
+---
+# handlers file for tftp
+
+- name: Restart tftp
+  systemd:
+    name: "{{ tftp_service }}"
+    daemon-reload: true
+    state: restarted
